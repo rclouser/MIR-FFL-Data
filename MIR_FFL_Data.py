@@ -20,8 +20,9 @@ try:
 
 	print('2')
 	
-	tableStats = soup.find("table", {"class" : "playerTableTable tableBody"})
-	for row in tableStats.findAll('tr') [3:-1]: ##first 3 rows are headers and don't need the last total row
+	tableStats_0 = soup.find("table", {"id" : "playertable_0"})
+	tableStats_1 = soup.find("table", {"id" : "playertable_1"})
+	for row in tableStats_0.findAll('tr') [3:-1]: ##first 3 rows are headers and don't need the last total row
 		col = row.findAll('td')
 		print('3-for')
 		try:
@@ -39,6 +40,23 @@ try:
 			print(e)
 			pass
 	print('4')
+	for row in tableStats_1.findAll('tr') [3:-1]: ##first 3 rows are headers and don't need the last total row
+		col = row.findAll('td')
+		print('5-for')
+		try:
+			##name = col[0].a.string.strip()
+			name = strip_html(0) ##couldn't get encode to work here. so cleanup and output are in 2 steps
+			##outputFile.write(name.encode('utf-8')+'\n')
+			outputFile.write(name.encode('utf-8'))
+			opp = strip_html(1)
+			outputFile.write(',' + opp.encode('utf-8'))
+			pts = strip_html(3)
+			outputFile.write(',' + pts.encode('utf-8') + '\n')
+			
+		except Exception as e:
+			errorFile.write (str(e) + '***' + str(col) + '\n')
+			print(e)
+			pass	
 except Exception as ex:
 	errorFile.write("Exception: " + str(ex))
 	print(ex)
@@ -46,7 +64,7 @@ except Exception as ex:
 	errorFile.close
 
 
-print('5')	
+print('6')	
 outputFile.close
 errorFile.close
 
