@@ -1,16 +1,40 @@
 from bs4 import BeautifulSoup
+import urllib2
 import time
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
+from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 
 
 errorFile = open('C:\Python27\Projects\MIR_FFL\output\ERROR-MIRData.txt','w')
 outputFile = open('C:\Python27\Projects\MIR_FFL\output\MIRData.txt','w')
+driver = webdriver.Chrome('C:\Google\Chromedriver\chromedriver_win32\chromedriver.exe') 
 print('start')
-
-soup = BeautifulSoup(open("C:\Python27\Projects\MIR_FFL\output\htmlSourceFile.txt"),"html.parser")
-
-owners = soup.findAll("div", {"class" : "teamInfoOwnerData"})
-
 try:
+	driver.get("http://games.espn.go.com/ffl/signin")
+	#implement wait it is mandatory in this case
+	WebDriverWait(driver,1000).until(EC.presence_of_all_elements_located((By.XPATH,"(//iframe)")))
+	frms = driver.find_elements_by_xpath("(//iframe)")
+	time.sleep(5)
+	driver.switch_to_frame(frms[1])
+	driver.find_element_by_xpath("(//input)[1]").send_keys("madskillzva")
+	driver.find_element_by_xpath("(//input)[2]").send_keys("deftones187")
+	driver.find_element_by_class_name("btn-submit").click()
+	driver.switch_to_default_content()
+	time.sleep(10)
+	print('1')	
+	driver.get("http://games.espn.com/ffl/boxscorequick?leagueId=44549&teamId=1&scoringPeriodId=1&seasonId=2007&view=scoringperiod&version=quick")
+	time.sleep(10)
+
+##soup = BeautifulSoup(open("C:\Python27\Projects\MIR_FFL\output\htmlSourceFile.txt"),"html.parser")
+	soup = BeautifulSoup(driver.page_source,"html.parser")
+
+	owners = soup.findAll("div", {"class" : "teamInfoOwnerData"})
+
 	for index,val in enumerate(owners):	
 		print(index)
 		print(owners[index])
@@ -40,9 +64,10 @@ except Exception as ex:
 	print(ex)
 	outputFile.close
 	errorFile.close
+	driver.close
 
 
 	
 outputFile.close
 errorFile.close
-
+driver.close
